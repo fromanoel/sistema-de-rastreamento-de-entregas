@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.iftm.rastreamento.model.Pacote;
 import br.edu.iftm.rastreamento.service.PacoteService;
+import br.edu.iftm.rastreamento.service.exceptions.NaoAcheiException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,7 +33,7 @@ public class PacoteController {
 	@Operation(summary = "Retorna todos os pacotes")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Lista de pacotes retornada com sucesso", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Pacote.class))}),
-		@ApiResponse(responseCode = "204", description = "Nenhum pacote encontrado")
+		@ApiResponse(responseCode = "204", description = "Nenhum pacote encontrado", content = @Content)
 	})
 	@GetMapping
 	public List<Pacote> getAllPacotes() {
@@ -58,7 +59,12 @@ public class PacoteController {
 	})
 	@GetMapping("/{id}")
 	public Pacote getPacoteById(@PathVariable Long id) {
-		return pacoteService.getPacoteById(id);
+		try{
+			return pacoteService.getPacoteById(id);
+	
+		} catch (Exception e){
+			throw new NaoAcheiException("Pacote não encontrado para o ID fornecido" + id);
+		}
 	}
 
 
@@ -69,7 +75,11 @@ public class PacoteController {
 	})
 	@PutMapping("/{id}")
 	public Pacote updatePacote(@PathVariable Long id, @RequestBody Pacote pacoteDetails) {
-		return pacoteService.updatePacote(id, pacoteDetails);
+		try{
+			return pacoteService.updatePacote(id, pacoteDetails);
+		} catch (Exception e){
+			throw new NaoAcheiException("Pacote não encontrado para o ID fornecido" + id);
+		}
 	}
 
 	@Operation(summary = "Deleta um pacote existente pelo ID")
@@ -85,7 +95,7 @@ public class PacoteController {
 	@Operation(summary = "Retorna pacotes por status")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Lista de pacotes por status retornada com sucesso", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Pacote.class))}),
-		@ApiResponse(responseCode = "204", description = "Nenhum pacote encontrado")
+		@ApiResponse(responseCode = "204", description = "Nenhum pacote encontrado", content = @Content)
 	})
 	@GetMapping("/status")
 	public List<Pacote> getPacotePorStatus(@RequestParam String status) {
@@ -95,7 +105,7 @@ public class PacoteController {
 	@Operation(summary = "Retorna pacotes por destinatário")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Lista de pacotes por destinatario retornada com sucesso", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Pacote.class))}),
-		@ApiResponse(responseCode = "204", description = "Nenhum pacote encontrado")
+		@ApiResponse(responseCode = "204", description = "Nenhum pacote encontrado", content = @Content)
 	})
 	@GetMapping("/destinatario")
 	public List<Pacote> getPacotePorDestinatario(@RequestParam String destinatario) {
